@@ -110,7 +110,7 @@ class TestRepository {
     asserts.assert(repo.getLibrary('tink_core').match(Success({ ver: '1.24.0' })));
     asserts.assert(repo.getLibrary('tink_core', '1.23.0').match(Success({ ver: '1.23.0' })));
     asserts.assert(repo.getLibrary('tink_core', '2.23.0').match(Failure(_)));
-    asserts.assert(init(tink_macro & tink_core & tink_syntaxhub).getLibrary('tink_syntaxhub').match(Failure(_)));
+    asserts.assert(init(tink_macro & tink_core & tink_syntaxhub).getLibrary('tink_syntaxhub').sure().getBuildInfo().match(Failure(_)));
 
     return asserts.done();
   }
@@ -118,7 +118,7 @@ class TestRepository {
   @:variant('tink_core')
   @:variant('coconut.vdom')
   public function real(lib:String) {
-    Sys.command('haxe -lib hx3compat -lib haxelib -main haxelib.client.Main -neko bin/haxelib.n');
+    asserts.assert(0 == Sys.command('haxe -lib hx3compat -lib haxelib -main haxelib.client.Main -neko bin/haxelib.n'));
 
     function callHaxeLib(args) {
       var out = 'bin/out.txt',
@@ -133,9 +133,9 @@ class TestRepository {
 
     var repo = new Resolver(Sys.getCwd()).repo().sure();
 
-    callHaxeLib('deleterepo');
-    callHaxeLib('newrepo');
-    callHaxeLib('install $lib --quiet');
+    asserts.assert(callHaxeLib('deleterepo').code == 0);
+    asserts.assert(callHaxeLib('newrepo').code == 0);
+    asserts.assert(callHaxeLib('install $lib --quiet').code == 0);
     var res = callHaxeLib('path $lib');
 
     asserts.assert(res.code == 0);
