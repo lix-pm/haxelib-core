@@ -35,7 +35,7 @@ class TestResolver {
     var resolver = new Resolver('.', new MockSystem(true, env, fs));
 
     switch [expected, resolver.globalRepoPath()] {
-      case [null, o]: asserts.assert(!o.isSuccess());
+      case [null, o]: asserts.assert(o.match(Failure(_)));
       case [_, Failure(e)]: asserts.assert(e.message == null);
       case [_, Success(p)]: asserts.assert(p == expected);
     }

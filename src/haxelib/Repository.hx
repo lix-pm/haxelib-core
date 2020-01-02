@@ -9,8 +9,7 @@ class Repository {
   public final global:Bool;
   final root:Path;
 
-  @:allow(haxelib.Resolver)
-  function new(sys, cwd, root, global) {
+  public function new(sys, cwd, root, global) {
     this.sys = sys;
     this.cwd = cwd;
     this.root = root;
@@ -35,8 +34,8 @@ class Repository {
       switch sys.readFile(dir / '.current') {
         case Success(ver):
           mk(ver);
-        case Failure(e):
-          Failure(new Error('Library $lib is not properly installed'));
+        case Failure(_):
+          Failure(new Error('Library $lib is not installed'));
       }
 
   }

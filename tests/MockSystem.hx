@@ -30,6 +30,8 @@ class MockSystem implements System {
     function crawl(e:Entry_, path:String)
       files[normalize(path)] =
         switch e {
+          case null | Left(null) | Left(Success(null)):
+            ENone;
           case Left(v):
             EFile(cast {
               get: () -> v,
@@ -58,12 +60,21 @@ abstract Entry(Entry_) to Entry_ {
   @:op(a & b) public function with(that:Entry)
     return switch [this, (that:Entry_)] {
       case [Right(a), Right(b)]:
-        var ret = new DynamicAccess();
+        var ret = new DynamicAccess<Entry>();
         for (d in [a, b])
           for (k => v in d)
-            ret[k] = v;
+            ret[k] = switch ret[k] {
+              case null: v;
+              case other: other.with(v);
+            }
         new Entry(Right(ret));
-      default: throw 'can only merge directories';
+      default: that;
+    }
+
+  public function ls():KeyValueIterator<String, Entry>
+    return switch this {
+      case null | Left(_): [].iterator();
+      case Right(dict): dict.keyValueIterator();
     }
 
   public function nestedIn(path:String):Entry {
@@ -71,8 +82,6 @@ abstract Entry(Entry_) to Entry_ {
     ret[path] = new Entry(this);
     return ret;
   }
-
-  // public function add()
 
   @:from static function ofString(s:String)
     return new Entry(Left(Success(s)));
@@ -83,6 +92,8 @@ abstract Entry(Entry_) to Entry_ {
   @:from static function ofDict(entries:DynamicAccess<Entry>)
     return new Entry(Right(entries));
 
-  static public function create(fsCreator:(fs:(entries:DynamicAccess<Entry>)->Entry)->Entry)
+  static public function create(fsCreator:FsCreator->Entry)
     return fsCreator(entries -> entries);
 }
+
+typedef FsCreator = (entries:DynamicAccess<Entry>)->Entry;
