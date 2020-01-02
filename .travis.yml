@@ -8,7 +8,7 @@ os:
   - linux
 
 install:
-  - npm install lix@15.54 -g
+  - npm install lix@15.5.4 -g
   - lix download
 
 script:
