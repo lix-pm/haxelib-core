@@ -120,11 +120,15 @@ class TestRepository {
   public function real(lib:String) {
     asserts.assert(0 == Sys.command('haxe -lib hx3compat -lib haxelib -main haxelib.client.Main -neko bin/haxelib.n'));
 
-    function callHaxeLib(args) {
+    function callHaxeLib(args)
+      return Sys.command('neko bin/haxelib.n $args');
+
+    function readHaxeLib(args) {
       var out = 'bin/out.txt',
           err = 'bin/err.txt';
 
-      var ret = Sys.command('neko bin/haxelib.n $args 1>$out 2>$err');
+      var ret = callHaxeLib('$args 1>$out 2>$err');
+
       return { code: ret, stdout: sys.io.File.getContent(out), stderr: sys.io.File.getContent(err) };
     }
 
@@ -133,10 +137,10 @@ class TestRepository {
 
     var repo = new Resolver(Sys.getCwd()).repo().sure();
 
-    asserts.assert(callHaxeLib('deleterepo').code == 0);
-    asserts.assert(callHaxeLib('newrepo').code == 0);
-    asserts.assert(callHaxeLib('install $lib --quiet').code == 0);
-    var res = callHaxeLib('path $lib');
+    asserts.assert(callHaxeLib('deleterepo') == 0);
+    asserts.assert(callHaxeLib('newrepo') == 0);
+    asserts.assert(callHaxeLib('install $lib --quiet') == 0);
+    var res = readHaxeLib('path $lib');
 
     asserts.assert(res.code == 0);
     asserts.assert(normalize(res.stdout) == repo.getLibrary(lib).sure().printArgs().sure());
