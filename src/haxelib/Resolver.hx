@@ -77,7 +77,7 @@ class Resolver {
     if (!global)
       switch localRepoPath() {
         case null:
-        case v: Success(v);
+        case v: return Success(v);
       }
 
     return globalRepoPath();

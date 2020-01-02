@@ -3,6 +3,7 @@ import haxelib.*;
 import MockSystem;
 
 using tink.CoreApi;
+using StringTools;
 
 private typedef Version = String;
 
@@ -110,6 +111,35 @@ class TestRepository {
     asserts.assert(repo.getLibrary('tink_core', '1.23.0').match(Success({ ver: '1.23.0' })));
     asserts.assert(repo.getLibrary('tink_core', '2.23.0').match(Failure(_)));
     asserts.assert(init(tink_macro & tink_core & tink_syntaxhub).getLibrary('tink_syntaxhub').match(Failure(_)));
+
+    return asserts.done();
+  }
+
+  @:variant('tink_core')
+  @:variant('coconut.vdom')
+  public function real(lib:String) {
+    Sys.command('haxe -lib hx3compat -lib haxelib -main haxelib.client.Main -neko bin/haxelib.n');
+
+    function callHaxeLib(args) {
+      var out = 'bin/out.txt',
+          err = 'bin/err.txt';
+
+      var ret = Sys.command('neko bin/haxelib.n $args 1>$out 2>$err');
+      return { code: ret, stdout: sys.io.File.getContent(out), stderr: sys.io.File.getContent(err) };
+    }
+
+    function normalize(s:String)
+      return s.replace('\r\n', '\n').replace('\\', '/');
+
+    var repo = new Resolver(Sys.getCwd()).repo().sure();
+
+    callHaxeLib('deleterepo');
+    callHaxeLib('newrepo');
+    callHaxeLib('install $lib --quiet');
+    var res = callHaxeLib('path $lib');
+
+    asserts.assert(res.code == 0);
+    asserts.assert(normalize(res.stdout) == repo.getLibrary(lib).sure().printArgs().sure());
 
     return asserts.done();
   }

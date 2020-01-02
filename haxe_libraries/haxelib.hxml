@@ -1,0 +1,4 @@
+-D haxelib=4.0.2
+# @install: lix --silent download "gh://github.com/HaxeFoundation/haxelib#4b27f91d8a4ff279d9903091680fee2c93a0d574" into haxelib/4.0.2/github/4b27f91d8a4ff279d9903091680fee2c93a0d574
+# @run: haxelib run-dir haxelib ${HAXE_LIBCACHE}/haxelib/4.0.2/github/4b27f91d8a4ff279d9903091680fee2c93a0d574
+-cp ${HAXE_LIBCACHE}/haxelib/4.0.2/github/4b27f91d8a4ff279d9903091680fee2c93a0d574/src

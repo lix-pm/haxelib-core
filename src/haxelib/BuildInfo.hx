@@ -27,6 +27,6 @@ abstract BuildInfo(Array<LibBuildInfo>) from Array<LibBuildInfo> {
   }
 
   @:to public function toString() {
-    return toLines().join('\n');
+    return toLines().join('\n') + '\n';
   }
 }
