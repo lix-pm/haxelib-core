@@ -6,7 +6,7 @@ import tink.testrunner.*;
 class RunTests {
   static function main() {
     Runner.run(TestBatch.make([
-      new TestConfig()
+      new TestResolver()
     ])).handle(Runner.exit);
   }
 }

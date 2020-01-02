@@ -3,7 +3,7 @@ import haxelib.*;
 using tink.CoreApi;
 
 @:asserts
-class TestConfig {
+class TestResolver {
 
   public function new() {}
 
