@@ -32,4 +32,13 @@ class SystemShortcuts {
 
   static public function isDir(s:System, path:Null<Path>)
     return path != null && s.readPath(path).match(EDirectory(_));
+
+  static public function readFile(s:System, path:Null<Path>)
+    return
+      if (path == null) Failure(new Error('no path given'));
+      else switch s.readPath(path) {
+        case EFile(f): f.get();
+        case ENone: Failure(new Error(NotFound, 'file not found: $path'));
+        case EDirectory(_): Failure(new Error(MethodNotAllowed, 'cannot open directory $path as a file'));
+      }
 }

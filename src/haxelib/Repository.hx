@@ -4,10 +4,10 @@ using tink.CoreApi;
 
 class Repository {
 
-  final sys:System;
-  final cwd:Path;
-  final root:String;
-  final global:Bool;
+  public final sys:System;
+  public final cwd:Path;
+  public final global:Bool;
+  final root:Path;
 
   @:allow(haxelib.Resolver)
   function new(sys, cwd, root, global) {
@@ -17,8 +17,28 @@ class Repository {
     this.global = global;
   }
 
-  public function getLibrary(lib:String):Outcome<Library, String> {
-    return Failure('not implemented');
+  public function getLibrary(lib:String, ?ver:String):Outcome<Library, Error> {
+    var dir = root / Path.safe(lib);
+
+    function mk(ver)
+      return Library.from(lib, ver, dir / Path.safe(ver), this);
+
+    if (Library.isPinned(ver))
+      return mk(ver);
+
+    switch sys.readFile(dir / '.dev') {
+      case Success(path):
+        return Library.from(lib, 'dev', path, this);
+      default:
+    }
+    return
+      switch sys.readFile(dir / '.current') {
+        case Success(ver):
+          mk(ver);
+        case Failure(e):
+          Failure(new Error('Library $lib is not properly installed'));
+      }
+
   }
 
 }

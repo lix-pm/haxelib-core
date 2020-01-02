@@ -24,4 +24,7 @@ abstract Path(String) to String {
     return
       if (s == null) null;//not sure this is the best treatment of null paths
       else new Path(normalize(s.trim()));
+
+  static public function safe(name:String)
+    return name.replace('.', ',');//TODO: haxelib throws if name doesn't match ~/^[A-Za-z0-9_.-]+$/
 }
